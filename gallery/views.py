@@ -2,9 +2,18 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from .models import Image
 from urllib import request
+import datetime
 
-def gallery_view(response):
-    return render(response, 'gallery.html', {})
+
+def gallery_view(request):
+    # Retrieve all images from the database (e.g., last month's images)
+    images = Image.objects.filter(created_date__gte=datetime.date.today() - datetime.timedelta(days=30))
+
+    context = {
+        'images': images
+    }
+
+    return render(request, 'gallery.html', context)
 
 
 def image_detail(request, pk):

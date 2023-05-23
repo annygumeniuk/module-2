@@ -1,24 +1,22 @@
-from django.test import TestCase, RequestFactory
+from django.test import TestCase
 from django.urls import reverse
+from django.core.files.uploadedfile import SimpleUploadedFile
+from datetime import date
 from .models import Image
-from .views import image_detail
-# Create your tests here.
 
 
-class ImageDetail(TestCase):
-    def setUp(self) -> None:
-        self.image = Image.objects.create(name='Test Image', url='test.jpg')
+class ImageDetailViewTest(TestCase):
+    def test_image_detail_view(self):
+        # Create a sample Image object for testing
+        image = Image.objects.create(
+            title='Test Image',
+            image=SimpleUploadedFile('test_image.jpg', b'content'),
+            created_date=date.today(),
+            age_limit=18
+        )
+        url = reverse('image_detail', kwargs={'pk': image.pk})
+        response = self.client.get(url)
 
-    def test_image_detail(self):
-        factory = RequestFactory()
-        request = factory.get(reverse('image_detail', args=[self.image.pk]))
-
-        # Call the view function
-        response = image_detail(request, self.image.pk)
         self.assertEqual(response.status_code, 200)
-
-        # Check if the rendered template is correct
         self.assertTemplateUsed(response, 'image_detail.html')
-
-        # Check if the image object is passed to the template context
-        self.assertEqual(response.context['image'], self.image)
+        self.assertEqual(response.context['image'], image)

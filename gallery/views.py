@@ -12,7 +12,6 @@ def gallery_view(request):
     context = {
         'images': images
     }
-
     return render(request, 'gallery.html', context)
 
 
